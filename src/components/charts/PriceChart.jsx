@@ -409,7 +409,7 @@ export const PriceChart = ({ onOpenDetail }) => {
                   width="70" 
                   height="22" 
                   rx="4" 
-                  fill={isGain ? 'rgba(16, 185, 129, 0.9)' : 'rgba(244, 63, 94, 0.9)'} 
+                  fill={isChartGain ? 'rgba(16, 185, 129, 0.9)' : 'rgba(244, 63, 94, 0.9)'} 
                 />
                 <text 
                   x="35" 
