@@ -82,10 +82,10 @@ export const CryptoProvider = ({ children }) => {
     if (absVal < 0.0001) {
       fractionDigits = 6;
     } else if (absVal < 1.05 && absVal >= 0.95) {
-      // Dành riêng cho Stablecoin (Tether USDT, USDC) quanh mốc 1$: hiển thị 4 chữ số thập phân ($0.9998)
-      fractionDigits = 4;
+      // Dành riêng cho Stablecoin (Tether USDT, USDC) quanh mốc 1$: hiển thị 5 chữ số thập phân ($0.99979)
+      fractionDigits = 5;
     } else if (absVal < 2) {
-      fractionDigits = 4;
+      fractionDigits = 5;
     }
 
     return new Intl.NumberFormat('en-US', { 

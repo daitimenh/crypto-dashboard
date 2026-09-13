@@ -46,7 +46,7 @@ export const PriceChart = ({ onOpenDetail }) => {
   const PADDING_TOP = 25;
   const PADDING_BOTTOM = 55; // Dành không gian cho trục thời gian ngang X-axis
   const PADDING_LEFT = 20;
-  const PADDING_RIGHT = 75;  // Dành không gian cho nhãn giá Y-axis bên phải
+  const PADDING_RIGHT = 82;  // Dành không gian cho nhãn giá Y-axis 5 chữ số thập phân
 
   // Tính toán đường cong SVG, min/max và các điểm mốc
   const { pathD, areaD, minPrice, maxPrice, points, priceLevels } = useMemo(() => {
@@ -412,13 +412,13 @@ export const PriceChart = ({ onOpenDetail }) => {
                 <rect 
                   x="0" 
                   y="0" 
-                  width="70" 
+                  width="78" 
                   height="22" 
                   rx="4" 
                   fill={isChartGain ? 'rgba(16, 185, 129, 0.9)' : 'rgba(244, 63, 94, 0.9)'} 
                 />
                 <text 
-                  x="35" 
+                  x="39" 
                   y="15" 
                   textAnchor="middle" 
                   fill="#ffffff" 
