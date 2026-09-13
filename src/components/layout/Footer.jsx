@@ -14,7 +14,7 @@ export const Footer = () => {
               <span>Đồ Án Môn Học: Công Nghệ Chuỗi Khối (Blockchain Technology)</span>
             </div>
             <p style={{ fontSize: '0.825rem', color: 'var(--text-muted)', marginTop: '0.35rem' }}>
-              Hệ thống Crypto Analytics Dashboard tích hợp CoinGecko REST API và Web3 MetaMask Wallet.
+              Hệ thống Crypto Analytics Dashboard tích hợp CoinGecko REST API & Binance Realtime Data Engine.
             </p>
           </div>
 
@@ -39,7 +39,7 @@ export const Footer = () => {
           </div>
           <div className="footer-team">
             <div className="member-chip">
-              <span>Thành viên 1:</span> Backend, CoinGecko API & Cache 30s
+              <span>Thành viên 1:</span> Backend, Data Engine & Multi-Tier Fallback
             </div>
             <div className="member-chip">
               <span>Thành viên 2:</span> Biểu đồ SVG, Trục thời gian & ScreenCTM
