@@ -22,11 +22,7 @@ export const PriceChart = ({ onOpenDetail }) => {
     coinGeckoService.getCoinChart(selectedCoin.id, 'usd', timeframe, selectedCoin.current_price)
       .then(res => {
         if (isMounted) {
-          let prices = res.data?.prices || [];
-          // Đồng bộ điểm giá cuối cùng của biểu đồ với mức giá thị trường mới nhất của CoinGecko
-          if (prices.length > 0 && selectedCoin.current_price) {
-            prices = [...prices, [Date.now(), selectedCoin.current_price]];
-          }
+          const prices = res.data?.prices || [];
           setChartData(prices);
           setLoading(false);
         }

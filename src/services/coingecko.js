@@ -3,7 +3,10 @@
 import { cacheService } from './cache';
 import { MOCK_COINS, MOCK_GLOBAL_DATA, generateMockChartData } from '../mock/mockData';
 
-const BASE_URL = 'https://api.coingecko.com/api/v3';
+// Sử dụng proxy /coingecko-api ở môi trường dev để tránh hoàn toàn lỗi CORS / Rate-Limit từ trình duyệt
+const BASE_URL = typeof window !== 'undefined' && window.location.origin
+  ? '/coingecko-api'
+  : 'https://api.coingecko.com/api/v3';
 
 export const coinGeckoService = {
   /**
@@ -21,7 +24,7 @@ export const coinGeckoService = {
       );
 
       if (response.status === 429) {
-        console.warn('⚠️ CoinGecko Rate Limit reached (429). Switching to robust Mock Data.');
+        console.warn('⚠️ CoinGecko Rate Limit (429). Using fallback.');
         return { data: MOCK_COINS, isMock: true, reason: 'rate_limited' };
       }
 
@@ -30,7 +33,7 @@ export const coinGeckoService = {
       }
 
       const data = await response.json();
-      cacheService.set(cacheKey, data, 30 * 1000); // Lưu cache 30s để cập nhật sát realtime
+      cacheService.set(cacheKey, data, 45 * 1000); // Cache 45s
       return { data, isMock: false, fromCache: false };
     } catch (error) {
       console.warn('⚠️ CoinGecko API unreachable, using Mock Data:', error.message);
@@ -76,19 +79,22 @@ export const coinGeckoService = {
         const found = MOCK_COINS.find(c => c.id === coinId) || MOCK_COINS[0];
         const basePrice = currentPrice || found.current_price;
         const mockChart = generateMockChartData(basePrice, days, coinId);
-        // Lưu cache 30s để khi người dùng bấm chuyển tab qua lại không bị gián đoạn hay spam API
-        cacheService.set(cacheKey, mockChart, 30 * 1000);
+        // KHÔNG lưu dữ liệu giả vào cache dài hạn để lần sau gọi lại dữ liệu thật ngay khi hết chặn
         return { data: mockChart, isMock: true };
       }
 
       const data = await response.json();
-      cacheService.set(cacheKey, data, 30 * 1000); // 30s
-      return { data, isMock: false };
+      if (data && data.prices && data.prices.length > 0) {
+        cacheService.set(cacheKey, data, 60 * 1000); // Lưu cache 60s cho dữ liệu thật từ CoinGecko
+        return { data, isMock: false };
+      }
+      
+      const found = MOCK_COINS.find(c => c.id === coinId) || MOCK_COINS[0];
+      const mockChart = generateMockChartData(currentPrice || found.current_price, days, coinId);
+      return { data: mockChart, isMock: true };
     } catch (e) {
       const found = MOCK_COINS.find(c => c.id === coinId) || MOCK_COINS[0];
-      const basePrice = currentPrice || found.current_price;
-      const mockChart = generateMockChartData(basePrice, days, coinId);
-      cacheService.set(cacheKey, mockChart, 30 * 1000);
+      const mockChart = generateMockChartData(currentPrice || found.current_price, days, coinId);
       return { data: mockChart, isMock: true };
     }
   }
