@@ -52,6 +52,27 @@ export const cacheService = {
   },
 
   /**
+   * Lấy dữ liệu gần nhất đã lưu kể cả khi đã quá hạn TTL (Stale-While-Revalidate)
+   * Giúp hệ thống không bao giờ bị rơi về dữ liệu giả lệch lạc khi CoinGecko bị 429
+   */
+  getStale(key) {
+    if (memoryCache.has(key)) {
+      return memoryCache.get(key).data;
+    }
+    try {
+      const stored = localStorage.getItem(`coingecko_cache_${key}`);
+      if (stored) {
+        const item = JSON.parse(stored);
+        if (item && item.data) {
+          memoryCache.set(key, item);
+          return item.data;
+        }
+      }
+    } catch (e) {}
+    return null;
+  },
+
+  /**
    * Xóa toàn bộ cache khi người dùng chủ động bấm 'Refresh'
    */
   clear() {

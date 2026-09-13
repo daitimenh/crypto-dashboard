@@ -28,23 +28,23 @@ export const MOCK_COINS = [
     symbol: "btc",
     name: "Bitcoin",
     image: "https://assets.coingecko.com/coins/images/1/large/bitcoin.png",
-    current_price: 67890.50,
-    market_cap: 1338901240120,
+    current_price: 77280.00,
+    market_cap: 1520901240120,
     market_cap_rank: 1,
     total_volume: 38940129032,
-    high_24h: 68450.00,
-    low_24h: 66210.00,
-    price_change_percentage_24h: 3.42,
-    price_change_percentage_7d_in_currency: 8.15,
+    high_24h: 77850.00,
+    low_24h: 76920.00,
+    price_change_percentage_24h: -0.08,
+    price_change_percentage_7d_in_currency: 2.15,
     circulating_supply: 19754200,
     total_supply: 21000000,
-    ath: 73750.07,
-    ath_change_percentage: -7.94,
-    ath_date: "2024-03-14T07:10:36.635Z",
+    ath: 108900.00,
+    ath_change_percentage: -29.0,
+    ath_date: "2025-01-20T07:10:36.635Z",
     atl: 67.81,
     contract_address: "Native Layer 1",
     sparkline_in_7d: {
-      price: [62800, 63100, 64200, 63900, 65100, 66400, 65800, 67200, 66900, 67890]
+      price: [75800, 76200, 76900, 76400, 77100, 77800, 77500, 77900, 77400, 77280]
     }
   },
   {
@@ -222,7 +222,7 @@ export const MOCK_COINS = [
  * Sử dụng hàm sóng lượng giác cố định (Deterministic Wave), không dùng Math.random()
  * để đảm bảo biểu đồ luôn ổn định, không bị nhảy lung tung hay đổi màu bất thường.
  */
-export function generateMockChartData(basePrice = 77000, days = 1, coinId = 'bitcoin') {
+export function generateMockChartData(basePrice = 77000, days = 1, coinId = 'bitcoin', priceChange24h = null) {
   const pointsCount = days === 1 ? 24 : days === 7 ? 48 : days === 30 ? 60 : 90;
   // Làm tròn mốc thời gian theo 5 phút để các lần gọi cùng thời điểm trả về kết quả giống nhau 100%
   const now = Math.floor(Date.now() / (5 * 60 * 1000)) * (5 * 60 * 1000);
@@ -232,14 +232,26 @@ export function generateMockChartData(basePrice = 77000, days = 1, coinId = 'bit
   const charSum = (coinId || 'btc').split('').reduce((acc, c) => acc + c.charCodeAt(0), 0);
   const phase = (charSum % 10) * 0.3;
 
+  // Xác định xu hướng dốc lên hay xuống theo biến động giá
+  // Nếu priceChange24h âm, đồ thị xuôi dốc xuống (ĐỎ) để đồng nhất hoàn toàn với nhãn phần trăm
+  let trendSign = 1;
+  if (priceChange24h !== null && priceChange24h !== undefined) {
+    trendSign = priceChange24h >= 0 ? 1 : -1;
+  } else {
+    // Mặc định Bitcoin âm nhẹ theo thị trường hiện nay
+    trendSign = (coinId === 'bitcoin' || coinId === 'ethereum') ? -1 : 1;
+  }
+
   const prices = [];
   for (let i = pointsCount; i >= 0; i--) {
     const timestamp = now - i * step;
     const t = i / pointsCount; // Từ 1 (quá khứ) về 0 (hiện tại)
     
-    // Tạo sóng giá thực tế nhưng cố định hoàn toàn
-    const wave = Math.sin(t * Math.PI * 4 + phase) * 0.012 + Math.cos(t * Math.PI * 2) * 0.008;
-    const trend = (0.5 - t) * 0.006; // Xu hướng nhẹ
+    // Sóng lượng giác dao động nhẹ
+    const wave = Math.sin(t * Math.PI * 4 + phase) * 0.008 + Math.cos(t * Math.PI * 2) * 0.005;
+    // Khi t=1 (quá khứ), trend = -0.008 * trendSign
+    // Khi t=0 (hiện tại), trend = +0.008 * trendSign
+    const trend = (0.5 - t) * 0.016 * trendSign;
     const price = basePrice * (1 + trend + wave);
     
     prices.push([timestamp, parseFloat(price.toFixed(2))]);

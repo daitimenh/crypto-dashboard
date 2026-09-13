@@ -19,7 +19,13 @@ export const PriceChart = ({ onOpenDetail }) => {
     let isMounted = true;
     setLoading(true);
 
-    coinGeckoService.getCoinChart(selectedCoin.id, 'usd', timeframe, selectedCoin.current_price)
+    coinGeckoService.getCoinChart(
+      selectedCoin.id, 
+      'usd', 
+      timeframe, 
+      selectedCoin.current_price, 
+      selectedCoin.price_change_percentage_24h
+    )
       .then(res => {
         if (isMounted) {
           const prices = res.data?.prices || [];
