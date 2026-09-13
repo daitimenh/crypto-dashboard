@@ -242,19 +242,24 @@ export function generateMockChartData(basePrice = 77000, days = 1, coinId = 'bit
     trendSign = (coinId === 'bitcoin' || coinId === 'ethereum') ? -1 : 1;
   }
 
+  const isStable = coinId === 'tether' || coinId === 'usd-coin' || (basePrice >= 0.95 && basePrice <= 1.05);
+  const amp = isStable ? 0.0006 : 0.008;
+  const trendAmp = isStable ? 0.0004 : 0.016;
+
   const prices = [];
   for (let i = pointsCount; i >= 0; i--) {
     const timestamp = now - i * step;
     const t = i / pointsCount; // Từ 1 (quá khứ) về 0 (hiện tại)
     
     // Sóng lượng giác dao động nhẹ
-    const wave = Math.sin(t * Math.PI * 4 + phase) * 0.008 + Math.cos(t * Math.PI * 2) * 0.005;
+    const wave = Math.sin(t * Math.PI * 4 + phase) * amp + Math.cos(t * Math.PI * 2) * (amp * 0.6);
     // Khi t=1 (quá khứ), trend = -0.008 * trendSign
     // Khi t=0 (hiện tại), trend = +0.008 * trendSign
-    const trend = (0.5 - t) * 0.016 * trendSign;
+    const trend = (0.5 - t) * trendAmp * trendSign;
     const price = basePrice * (1 + trend + wave);
     
-    prices.push([timestamp, parseFloat(price.toFixed(2))]);
+    const decimals = isStable || basePrice < 2 ? 5 : 2;
+    prices.push([timestamp, parseFloat(price.toFixed(decimals))]);
   }
   return { prices };
 }

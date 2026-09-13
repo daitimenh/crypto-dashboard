@@ -33,7 +33,8 @@ const COIN_TO_BINANCE = {
  * Lấy nến giá lịch sử trực tiếp từ Binance Public API (Cực nhanh, thời gian thực 100%, không bị 429)
  */
 async function fetchBinanceKlines(coinId, days = 1) {
-  const symbol = COIN_TO_BINANCE[coinId] || `${coinId.toUpperCase()}USDT`;
+  const isTether = coinId === 'tether';
+  const symbol = isTether ? 'USDCUSDT' : (COIN_TO_BINANCE[coinId] || `${coinId.toUpperCase()}USDT`);
   let interval = '5m';
   let limit = 288;
   if (days === 7) {
@@ -53,7 +54,10 @@ async function fetchBinanceKlines(coinId, days = 1) {
   if (!Array.isArray(data) || data.length === 0) throw new Error('Dữ liệu Binance rỗng');
 
   return {
-    prices: data.map(k => [k[0], parseFloat(k[4])])
+    prices: data.map(k => {
+      const p = parseFloat(k[4]);
+      return [k[0], isTether ? parseFloat((1 / p).toFixed(5)) : p];
+    })
   };
 }
 

@@ -75,7 +75,25 @@ export const CryptoProvider = ({ children }) => {
       const vndVal = valInUsd * USD_VND_RATE;
       return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(vndVal);
     }
-    return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', minimumFractionDigits: 2 }).format(valInUsd);
+    
+    // Điều chỉnh số chữ số thập phân linh hoạt theo mệnh giá tài sản (chuẩn CoinGecko)
+    let fractionDigits = 2;
+    const absVal = Math.abs(valInUsd);
+    if (absVal < 0.0001) {
+      fractionDigits = 6;
+    } else if (absVal < 1.05 && absVal >= 0.95) {
+      // Dành riêng cho Stablecoin (Tether USDT, USDC) quanh mốc 1$: hiển thị 4 chữ số thập phân ($0.9998)
+      fractionDigits = 4;
+    } else if (absVal < 2) {
+      fractionDigits = 4;
+    }
+
+    return new Intl.NumberFormat('en-US', { 
+      style: 'currency', 
+      currency: 'USD', 
+      minimumFractionDigits: fractionDigits,
+      maximumFractionDigits: fractionDigits
+    }).format(valInUsd);
   };
 
   const formatNumber = (num) => {
