@@ -62,7 +62,7 @@ export const coinGeckoService = {
   /**
    * Lấy biểu đồ lịch sử giá của một Coin (Market Chart)
    */
-  async getCoinChart(coinId = 'bitcoin', vsCurrency = 'usd', days = 1) {
+  async getCoinChart(coinId = 'bitcoin', vsCurrency = 'usd', days = 1, currentPrice = null) {
     const cacheKey = `chart_${coinId}_${vsCurrency}_${days}`;
     const cached = cacheService.get(cacheKey);
     if (cached) return { data: cached, isMock: false, fromCache: true };
@@ -74,7 +74,10 @@ export const coinGeckoService = {
 
       if (response.status === 429 || !response.ok) {
         const found = MOCK_COINS.find(c => c.id === coinId) || MOCK_COINS[0];
-        const mockChart = generateMockChartData(found.current_price, days);
+        const basePrice = currentPrice || found.current_price;
+        const mockChart = generateMockChartData(basePrice, days, coinId);
+        // Lưu cache 30s để khi người dùng bấm chuyển tab qua lại không bị gián đoạn hay spam API
+        cacheService.set(cacheKey, mockChart, 30 * 1000);
         return { data: mockChart, isMock: true };
       }
 
@@ -83,7 +86,9 @@ export const coinGeckoService = {
       return { data, isMock: false };
     } catch (e) {
       const found = MOCK_COINS.find(c => c.id === coinId) || MOCK_COINS[0];
-      const mockChart = generateMockChartData(found.current_price, days);
+      const basePrice = currentPrice || found.current_price;
+      const mockChart = generateMockChartData(basePrice, days, coinId);
+      cacheService.set(cacheKey, mockChart, 30 * 1000);
       return { data: mockChart, isMock: true };
     }
   }

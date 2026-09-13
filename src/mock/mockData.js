@@ -218,22 +218,31 @@ export const MOCK_COINS = [
 ];
 
 /**
- * Hàm sinh chuỗi giá theo khung thời gian phục vụ vẽ biểu đồ (Chart)
+ * Hàm sinh chuỗi giá theo khung thời gian phục vụ vẽ biểu đồ (Chart).
+ * Sử dụng hàm sóng lượng giác cố định (Deterministic Wave), không dùng Math.random()
+ * để đảm bảo biểu đồ luôn ổn định, không bị nhảy lung tung hay đổi màu bất thường.
  */
-export function generateMockChartData(basePrice, days = 7) {
+export function generateMockChartData(basePrice = 77000, days = 1, coinId = 'bitcoin') {
   const pointsCount = days === 1 ? 24 : days === 7 ? 48 : days === 30 ? 60 : 90;
-  const now = Date.now();
+  // Làm tròn mốc thời gian theo 5 phút để các lần gọi cùng thời điểm trả về kết quả giống nhau 100%
+  const now = Math.floor(Date.now() / (5 * 60 * 1000)) * (5 * 60 * 1000);
   const step = (days * 24 * 3600 * 1000) / pointsCount;
   
-  const prices = [];
-  let current = basePrice * (1 - (Math.random() * 0.1 - 0.05));
+  // Tạo seed cố định từ tên coin
+  const charSum = (coinId || 'btc').split('').reduce((acc, c) => acc + c.charCodeAt(0), 0);
+  const phase = (charSum % 10) * 0.3;
 
+  const prices = [];
   for (let i = pointsCount; i >= 0; i--) {
     const timestamp = now - i * step;
-    const volatility = basePrice * 0.015;
-    const delta = (Math.random() - 0.48) * volatility;
-    current = Math.max(current + delta, basePrice * 0.3);
-    prices.push([timestamp, parseFloat(current.toFixed(2))]);
+    const t = i / pointsCount; // Từ 1 (quá khứ) về 0 (hiện tại)
+    
+    // Tạo sóng giá thực tế nhưng cố định hoàn toàn
+    const wave = Math.sin(t * Math.PI * 4 + phase) * 0.012 + Math.cos(t * Math.PI * 2) * 0.008;
+    const trend = (0.5 - t) * 0.006; // Xu hướng nhẹ
+    const price = basePrice * (1 + trend + wave);
+    
+    prices.push([timestamp, parseFloat(price.toFixed(2))]);
   }
   return { prices };
 }

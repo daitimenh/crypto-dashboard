@@ -19,7 +19,7 @@ export const PriceChart = ({ onOpenDetail }) => {
     let isMounted = true;
     setLoading(true);
 
-    coinGeckoService.getCoinChart(selectedCoin.id, 'usd', timeframe)
+    coinGeckoService.getCoinChart(selectedCoin.id, 'usd', timeframe, selectedCoin.current_price)
       .then(res => {
         if (isMounted) {
           let prices = res.data?.prices || [];
@@ -124,7 +124,16 @@ export const PriceChart = ({ onOpenDetail }) => {
 
   if (!selectedCoin) return null;
 
-  const isGain = (selectedCoin.price_change_percentage_24h || 0) >= 0;
+  // Xác định màu sắc biểu đồ theo xu hướng của khung thời gian đang xem (Gain: Xanh, Loss: Đỏ)
+  const isGain = useMemo(() => {
+    if (chartData.length >= 2) {
+      const firstPrice = chartData[0][1];
+      const lastPrice = chartData[chartData.length - 1][1];
+      return lastPrice >= firstPrice;
+    }
+    return (selectedCoin.price_change_percentage_24h || 0) >= 0;
+  }, [chartData, selectedCoin]);
+
   const strokeColor = isGain ? '#10b981' : '#f43f5e';
   const gradientId = `gradient-${selectedCoin.id}`;
 

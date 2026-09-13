@@ -30,8 +30,19 @@ export const CryptoProvider = ({ children }) => {
         coinGeckoService.getGlobalData()
       ]);
 
-      setCoins(coinsRes.data || []);
-      setGlobalData(globalRes.data || null);
+      // Nếu API bị rate limit nhưng đã có dữ liệu thật trong State thì giữ nguyên dữ liệu thật!
+      setCoins(prev => {
+        if (coinsRes.isMock && prev && prev.length > 0) {
+          return prev;
+        }
+        return coinsRes.data || [];
+      });
+
+      setGlobalData(prev => {
+        if (globalRes.isMock && prev) return prev;
+        return globalRes.data || null;
+      });
+
       setIsMockActive(coinsRes.isMock || globalRes.isMock);
       setLastUpdated(new Date());
 
