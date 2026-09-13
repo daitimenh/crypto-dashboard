@@ -45,10 +45,10 @@ export const Footer = () => {
               <span>Thành viên 2:</span> Biểu đồ SVG, Trục thời gian & ScreenCTM
             </div>
             <div className="member-chip">
-              <span>Thành viên 3:</span> Kết nối Web3 MetaMask & Phí Gas on-chain
+              <span>Thành viên 3:</span> Xu hướng Thị trường, Top Gainers & Losers 24H
             </div>
             <div className="member-chip">
-              <span>Thành viên 4:</span> Quản lý Danh mục PnL & Tra cứu Smart Contract
+              <span>Thành viên 4:</span> Bảng giá Top Coins, Bộ lọc & Chi tiết ATH/ATL
             </div>
           </div>
         </div>

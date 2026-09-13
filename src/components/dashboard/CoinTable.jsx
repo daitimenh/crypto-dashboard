@@ -193,23 +193,15 @@ export const CoinTable = ({ onOpenDetail, onQuickAddToPortfolio }) => {
                     {renderSparkline(sparklinePrices, isGain7d)}
                   </td>
                   <td style={{ textAlign: 'center' }} onClick={(e) => e.stopPropagation()}>
-                    <div style={{ display: 'flex', gap: '0.4rem', justifyContent: 'center' }}>
-                      <button 
-                        className="btn btn-outline btn-sm"
-                        title="Xem chi tiết on-chain & ATH"
-                        onClick={() => onOpenDetail(coin)}
-                      >
-                        <Eye size={13} />
-                      </button>
-                      <button 
-                        className="btn btn-outline btn-sm"
-                        title="Thêm vào danh mục Portfolio"
-                        onClick={() => onQuickAddToPortfolio(coin)}
-                        style={{ color: 'var(--accent-cyan)' }}
-                      >
-                        <PlusCircle size={13} />
-                      </button>
-                    </div>
+                    <button 
+                      className="btn btn-outline btn-sm"
+                      style={{ fontSize: '0.75rem', gap: '0.35rem', padding: '0.3rem 0.65rem' }}
+                      title="Xem chi tiết dự án & ATH/ATL"
+                      onClick={() => onOpenDetail(coin)}
+                    >
+                      <Eye size={13} />
+                      <span>Chi tiết</span>
+                    </button>
                   </td>
                 </tr>
               );

@@ -1,6 +1,6 @@
-# 🌐 CryptoPulse.Web3 - Crypto Analytics Dashboard
+# 🌐 CryptoPulse.Analytics - Realtime Crypto Dashboard
 
-Dashboard theo dõi tỷ giá tiền mã hóa thời gian thực bằng **CoinGecko REST API**, tích hợp **Web3 MetaMask** và quản lý danh mục đầu tư (**Portfolio PnL**).
+Dashboard theo dõi tỷ giá tiền mã hóa theo thời gian thực sử dụng **CoinGecko REST API**, hỗ trợ phân tích xu hướng thị trường, biểu đồ SVG động đa khung thời gian và tra cứu chi tiết các dự án Blockchain.
 
 ---
 
@@ -21,22 +21,21 @@ npm run build
 
 ## 👥 2. Phân công Code & Viết Báo cáo (Tất cả 4 thành viên đều trực tiếp viết Code)
 
-> ⚠️ **Đảm bảo tính công bằng & Điểm số:** Mỗi thành viên đều làm chủ một module kỹ thuật độc lập, có file code riêng đứng tên để giảng viên kiểm tra Git commit log và vấn đáp trực tiếp.
-
 | Thành viên | Module Code đảm nhiệm | Nội dung phụ trách viết trong Báo cáo |
 | :--- | :--- | :--- |
-| **Thành viên 1**<br>*(Backend & Data)* | • `coingecko.js`<br>• `cache.js`<br>• `CryptoContext.jsx` | • Tích hợp REST API CoinGecko.<br>• Thuật toán Cache In-Memory + LocalStorage 30s chống lỗi 429.<br>• State quản lý thị trường & chuyển đổi tiền tệ USD/VND. |
+| **Thành viên 1**<br>*(Backend & Data)* | • `coingecko.js`<br>• `cache.js`<br>• `CryptoContext.jsx` | • Tích hợp REST API CoinGecko qua Vite Proxy.<br>• Thuật toán Cache In-Memory + LocalStorage 30s chống lỗi 429.<br>• State quản lý thị trường & chuyển đổi tiền tệ USD/VND. |
 | **Thành viên 2**<br>*(UI & Biểu đồ SVG)* | • `PriceChart.jsx`<br>• `MarketOverview.jsx` | • Thuật toán vẽ biểu đồ SVG động & miền màu Gradient.<br>• Ma trận đảo tọa độ `SVG ScreenCTM` giúp chuột bắt dính 100%.<br>• Trục thời gian ngang X-axis đa khung giờ (24H, 7D, 30D, 1Y). |
-| **Thành viên 3**<br>*(Blockchain & Web3)* | • `web3Service.js`<br>• `WalletContext.jsx`<br>• `WalletConnectButton.jsx`<br>• `GasTracker.jsx` | • Kết nối ví phi tập trung MetaMask & Provider ví Demo Sepolia.<br>• Truy vấn số dư ETH on-chain và theo dõi phí Gas mạng lưới (Gwei). |
-| **Thành viên 4**<br>*(Portfolio & On-Chain)* | • `PortfolioView.jsx`<br>• `CoinDetailModal.jsx`<br>• `CoinTable.jsx` | • Thuật toán tính toán tài chính: Vốn đầu tư, Giá DCA, Lời/Lỗ ròng (PnL % và $).<br>• Phân tích chỉ số On-chain: ATH/ATL, tra cứu Smart Contract Address.<br>• Thuật toán tìm kiếm, phân loại danh mục và Mini Sparklines 7D. |
+| **Thành viên 3**<br>*(Market Trends)* | • `MarketTrends.jsx` | • Phân hệ phát hiện xu hướng thị trường nổi bật 24H.<br>• Thuật toán lọc Top Gainers (Tăng mạnh nhất), Top Losers (Giảm sâu nhất) và Highest Volume.<br>• Liên kết tương tác với biểu đồ chính khi click chọn coin. |
+| **Thành viên 4**<br>*(Bảng giá & Chi tiết)* | • `CoinTable.jsx`<br>• `CoinDetailModal.jsx`<br>• `Navbar.jsx` | • Bảng giá Top coins với Mini Sparklines 7 ngày.<br>• Thuật toán tìm kiếm, phân loại danh mục (Layer 1, DeFi, Meme).<br>• Phân tích chỉ số On-chain: Đỉnh ATH, Đáy ATL, Contract Address. |
 
 ---
 
 ## 🚀 3. Điểm nổi bật kỹ thuật của Hệ thống
 
-1. **Đồng bộ hóa thời gian:** Biểu đồ mặc định mở khung **24H** khớp trực tiếp với CoinGecko & Binance; nối điểm giá tức thời và hiển thị mốc `CoinGecko Sync`.
-2. **Chuột bắt dính 100%:** Dùng phép biến đổi ma trận `ScreenCTM` giải quyết triệt để lỗi lệch tọa độ trục khi rê chuột.
-3. **Phù hợp môi trường chấm bài:** Có sẵn **Ví Web3 Sepolia Demo** (có 2.458 ETH) và **Safe Mode Cache** đảm bảo khi thầy cô chấm bài luôn chạy mượt mà, không phụ thuộc vào tiện ích cài trên máy.
+1. **Dữ liệu thật 100% từ CoinGecko:** Tích hợp Vite Proxy (`/coingecko-api`) loại bỏ hoàn toàn lỗi chặn CORS của trình duyệt, cập nhật sát theo từng phút của thị trường toàn cầu.
+2. **Biểu đồ trực quan chính xác:** Mặc định mở khung **24H** (khớp với CoinGecko & Binance), chuột bắt dính 100% nhờ ma trận `SVG ScreenCTM`, có trục thời gian ngang X-axis rõ ràng.
+3. **Phân tích xu hướng thông minh (Market Trends):** Tự động phát hiện Top 3 đồng coin tăng/giảm mạnh nhất trong 24 giờ.
+4. **Chuyển đổi tiền tệ linh hoạt:** Hỗ trợ xem tỷ giá theo cả **USD ($)** và **VND (₫)**.
 
 ---
 

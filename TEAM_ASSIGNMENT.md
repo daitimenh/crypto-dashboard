@@ -1,6 +1,7 @@
 # 📘 BẢNG PHÂN CÔNG CODE & NỘI DUNG BÁO CÁO 4 THÀNH VIÊN
+*(Đề tài: Hệ thống Dashboard Theo Dõi Tỷ Giá Tiền Mã Hóa - CoinGecko Analytics)*
 
-> ⚠️ **Quy tắc bắt buộc:** Cả 4 thành viên đều **trực tiếp viết code** cho module chức năng của mình (đảm bảo lịch sử Git commit đồng đều, không ai chỉ làm báo cáo để tránh bị đánh giá thấp điểm). Mỗi người tự phụ trách viết nội dung và chụp ảnh minh chứng cho module mình code.
+> ⚠️ **Quy tắc bắt buộc:** Cả 4 thành viên đều **trực tiếp viết code** cho module chức năng của mình trên Dashboard, đảm bảo lịch sử Git commit đồng đều. Mỗi người tự phụ trách viết thuyết minh kỹ thuật và chụp ảnh minh chứng cho module mình lập trình.
 
 ---
 
@@ -12,8 +13,8 @@
      ┌──────────────────┬───────────────┴───────────────┬──────────────────┐
      ▼                  ▼                               ▼                  ▼
 [Thành viên 1]     [Thành viên 2]                 [Thành viên 3]     [Thành viên 4]
-Tầng Dữ liệu &      Tầng Biểu đồ &                 Tầng Web3 &        Tầng Quản lý PnL &
-Cache chống 429     Trực quan hóa SVG             Blockchain On-chain Tra cứu On-chain
+Tầng Dữ liệu &      Tầng Biểu đồ SVG &             Tầng Xu hướng      Tầng Bảng giá,
+Cache chống 429     Trục thời gian X-axis          Gainers/Losers 24H Tra cứu ATH/ATL
 ```
 
 ---
@@ -42,26 +43,27 @@ Cache chống 429     Trực quan hóa SVG             Blockchain On-chain Tra c
 
 ---
 
-### 👨‍💻 **Thành viên 3: Blockchain & Web3 Specialist**
+### 👨‍💻 **Thành viên 3: Market Trends & Highlights Lead**
 * **Files code đảm nhiệm:**
-  * `src/services/web3Service.js`: Kết nối RPC với ví phi tập trung MetaMask (`window.ethereum`), lấy địa chỉ tài khoản on-chain (`eth_requestAccounts`) và số dư ETH (`eth_getBalance`).
-  * Xây dựng Provider giả lập ví Web3 Testnet Sepolia phục vụ môi trường máy giảng viên không cài extension.
-  * `src/context/WalletContext.jsx`: Quản lý phiên kết nối ví, xử lý sự kiện thay đổi ví và theo dõi phí Gas mạng lưới Ethereum (Gwei).
-  * `src/components/web3/WalletConnectButton.jsx` & `GasTracker.jsx`: Xây dựng giao diện tương tác ví và widget phí Gas.
+  * `src/components/dashboard/MarketTrends.jsx`: Lập trình phân hệ phát hiện xu hướng thị trường nóng:
+    * Thuật toán lọc & sắp xếp **Top 3 Coin tăng giá mạnh nhất 24H (Top Gainers)**.
+    * Thuật toán lọc & sắp xếp **Top 3 Coin giảm giá sâu nhất 24H (Top Losers)**.
+    * Thuật toán lọc & sắp xếp **Top 3 Coin có khối lượng giao dịch đột biến (Highest Volume)**.
+    * Tích hợp sự kiện tương tác: Click vào bất kỳ coin nào trong Top Trends sẽ tự động chuyển biểu đồ chính sang theo dõi coin đó.
 * **Nội dung viết Báo cáo:**
-  * Chương: *Ứng dụng Công nghệ Chuỗi khối (Blockchain Integration)*.
-  * Trình bày cơ chế kết nối ví phi tập trung, đọc dữ liệu on-chain và đo lường phí giao dịch Gas.
+  * Chương: *Thuật toán Phân tích Xu hướng Thị trường Nổi bật (Market Trends)*.
+  * Trình bày logic sắp xếp động các mảng dữ liệu tài chính đa chiều.
 
 ---
 
-### 👨‍💻 **Thành viên 4: Financial Logic & On-Chain Explorer Lead**
+### 👨‍💻 **Thành viên 4: Market Table, Search & Deep Analytics Lead**
 * **Files code đảm nhiệm:**
-  * `src/components/portfolio/PortfolioView.jsx`: Lập trình module Quản lý danh mục đầu tư; tính toán tài chính: Vốn đầu tư gốc, Giá mua trung bình (DCA), Giá trị thị trường hiện tại và tỷ lệ Lời/Lỗ ròng (**Net PnL % và $**) theo dữ liệu giá realtime; đồng bộ LocalStorage.
-  * `src/components/coin-detail/CoinDetailModal.jsx`: Phân tích chỉ số On-chain chuyên sâu (Đỉnh ATH, Đáy ATL, Nguồn cung lưu hành, Smart Contract Address kèm sao chép clipboard).
-  * `src/components/dashboard/CoinTable.jsx`: Bảng xếp hạng Top Coins, thuật toán lọc phân loại (Layer 1, DeFi, Meme, Stablecoin), thuật toán sắp xếp đa tiêu chí và biểu đồ Mini Sparkline 7D.
+  * `src/components/dashboard/CoinTable.jsx`: Bảng xếp hạng giá Top coins, thuật toán tìm kiếm thời gian thực (Search filter), bộ lọc danh mục (Layer 1, DeFi, Meme, Stablecoin), sắp xếp đa cột (Sort by Price, Volume, Market Cap) và biểu đồ mini Sparklines 7 ngày.
+  * `src/components/coin-detail/CoinDetailModal.jsx`: Phân tích chuyên sâu từng dự án: Đỉnh cao nhất mọi thời đại (ATH), Đáy thấp nhất (ATL), Cung lưu hành (Circulating Supply), Smart Contract Address và liên kết trang web chính thức.
+  * `src/components/layout/Navbar.jsx`: Thanh điều hướng, công tắc chuyển đổi tiền tệ USD ↔ VND và nút làm mới dữ liệu.
 * **Nội dung viết Báo cáo:**
-  * Chương: *Thuật toán Quản lý Danh mục Đầu tư (PnL) & Tra cứu Hợp đồng On-Chain*.
-  * Trình bày công thức tính toán tài chính PnL và cấu trúc dữ liệu lưu trữ danh mục.
+  * Chương: *Thiết kế Bảng Dữ liệu Thị trường & Tra cứu Chi tiết Dự án*.
+  * Trình bày các thuật toán tìm kiếm, phân loại và kiến trúc cửa sổ Modal phân tích dữ liệu.
 
 ---
 
@@ -76,10 +78,10 @@ Cache chống 429     Trực quan hóa SVG             Blockchain On-chain Tra c
 ## 💡 3. Các câu hỏi phản biện trọng tâm của Giảng viên
 
 1. **Câu hỏi cho Thành viên 1 (Data):** *"Làm sao hệ thống không bị lỗi HTTP 429 khi CoinGecko giới hạn lượt gọi?"*
-   * *Trả lời:* Dùng cơ chế Cache 2 tầng (In-memory + LocalStorage 30s). Mọi request trùng lặp đều đọc từ cache. Nếu bị 429 thì tự động kích hoạt Safe Mode nạp dữ liệu dự phòng chuẩn, không bao giờ để web bị sập.
+   * *Trả lời:* Dùng cơ chế Cache 2 tầng (In-memory + LocalStorage 30s) và Vite Proxy trung gian (`/coingecko-api`) để loại bỏ hoàn toàn lỗi CORS và tránh spam request lên máy chủ.
 2. **Câu hỏi cho Thành viên 2 (Biểu đồ):** *"Tại sao chuột di chuyển trên biểu đồ bắt dính chính xác vào các mốc thời gian?"*
    * *Trả lời:* Sử dụng ma trận đảo tọa độ `SVG ScreenCTM` của phần tử SVG để ánh xạ trực tiếp pixel màn hình chuột sang tọa độ viewBox nội bộ, không bị ảnh hưởng bởi CSS scale.
-3. **Câu hỏi cho Thành viên 3 (Blockchain):** *"Dự án tương tác với Blockchain ở điểm nào?"*
-   * *Trả lời:* Tích hợp Web3 Provider kết nối ví MetaMask, truy vấn số dư ETH on-chain và theo dõi phí Gas của mạng lưới Ethereum thời gian thực.
-4. **Câu hỏi cho Thành viên 4 (Portfolio & On-chain):** *"Công thức tính PnL và việc quản lý danh mục đầu tư hoạt động ra sao?"*
-   * *Trả lời:* Hệ thống tính `PnL = (Giá thị trường - Giá mua) × Khối lượng`, kết hợp tra cứu Smart Contract on-chain và phân loại token theo Layer 1/DeFi/Meme.
+3. **Câu hỏi cho Thành viên 3 (Xu hướng):** *"Phân hệ Market Trends hoạt động như thế nào?"*
+   * *Trả lời:* Hệ thống tính toán và sắp xếp mảng dữ liệu thị trường theo 3 trường `% thay đổi 24h tăng dần, giảm dần và tổng volume`, liên kết state với biểu đồ trung tâm.
+4. **Câu hỏi cho Thành viên 4 (Bảng giá & Chi tiết):** *"Tính năng tìm kiếm và lọc danh mục hoạt động ra sao?"*
+   * *Trả lời:* Áp dụng cơ chế lọc mảng nhiều lớp (Multi-stage array filtering) kết hợp tìm kiếm theo chuỗi (Symbol/Name) và kiểm tra danh mục Web3 (Layer 1, DeFi, Meme).
