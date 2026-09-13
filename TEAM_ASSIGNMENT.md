@@ -22,6 +22,7 @@ Multi-Tier Engine  Trục thời gian X-axis          Gainers/Losers 24H Tra c�
 
 ### 👨‍💻 **Thành viên 1: Backend / Data Engine & Caching Lead**
 * **Files code đảm nhiệm:**
+  * `vite.config.js`: Cấu hình máy chủ Reverse Proxy trung gian (`/coingecko-api`), giả lập User-Agent vượt qua tường lửa Cloudflare và triệt tiêu lỗi chặn CORS của trình duyệt.
   * `src/services/coingecko.js`: Lập trình REST client đa nguồn, định tuyến các endpoint (`markets`, `market_chart`, `global`).
   * `src/services/cache.js`: Lập trình thuật toán Cache In-Memory + LocalStorage kết hợp giải thuật `Stale-While-Revalidate` (`getStale`) giúp bảo toàn tỷ giá thực khi gặp lỗi `HTTP 429`.
   * **Kiến trúc Multi-Tier Fallback:** Tích hợp tầng dự phòng Binance Public REST API (`/api/v3/ticker/24hr` và `/api/v3/klines`) lấy nến giá thời gian thực với hạn mức 1.200 req/phút, không bao giờ bị nghẽn mạng.

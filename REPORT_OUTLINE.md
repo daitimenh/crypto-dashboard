@@ -29,9 +29,38 @@
 *Người phụ trách: Thành viên 1 - Backend & Data Engine Lead*  
 *Mã nguồn phụ trách:* `src/services/coingecko.js`, `src/services/cache.js`, `src/context/CryptoContext.jsx`, `src/mock/mockData.js`.
 
-### 1.1. Kết nối REST API & Giải pháp CORS
-- Tích hợp **CoinGecko REST API v3** thông qua cơ chế Proxy trung gian của Vite (`/coingecko-api`).
-- **Ưu điểm:** Loại bỏ hoàn toàn lỗi chặn Cross-Origin Resource Sharing (CORS) từ trình duyệt mà không cần dựng thêm một backend Node.js cồng kềnh.
+### 1.1. Kết nối REST API & Giải pháp Proxy Trung Gian Chống Hạn Chế (Vite Reverse Proxy)
+- **Mã nguồn cấu hình:** File `vite.config.js` (dòng 9–19) và `src/services/coingecko.js` (dòng 7–9).
+- **Mô hình kiến trúc:**
+  ```
+  [Client / Trình duyệt] 
+          │  (1. Gửi request nội bộ: http://localhost:3000/coingecko-api/...)
+          ▼
+  [Vite Reverse Proxy Server] 
+          │  (2. Gỡ bỏ tiền tố, đính kèm User-Agent & changeOrigin: true)
+          ▼
+  [CoinGecko REST API Cloud: https://api.coingecko.com/api/v3/...]
+  ```
+- **Mã nguồn cấu hình chi tiết (`vite.config.js`):**
+  ```javascript
+  server: {
+    port: 3000,
+    proxy: {
+      '/coingecko-api': {
+        target: 'https://api.coingecko.com/api/v3',
+        changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/coingecko-api/, ''),
+        headers: {
+          'Accept': 'application/json',
+          'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)' // Giả lập trình duyệt chuẩn để vượt qua tường lửa Cloudflare/WAF
+        }
+      }
+    }
+  }
+  ```
+- **Hai lợi ích kỹ thuật cốt lõi:**
+  1. **Triệt tiêu 100% lỗi CORS (Cross-Origin Resource Sharing):** Trình duyệt nghiêm cấm JavaScript gọi trực tiếp từ `localhost:3000` sang domain khác `api.coingecko.com`. Khi đi qua Proxy trung gian, request gửi đến cùng Origin (`localhost:3000`), trình duyệt hoàn toàn không chặn.
+  2. **Vượt qua cơ chế lọc Bot của Cloudflare (Anti-Bot WAF):** CoinGecko sử dụng Cloudflare để chặn các HTTP request tự động không có header hợp lệ. Proxy trung gian đóng vai trò như một máy chủ Nginx thu nhỏ, tự động đính kèm `User-Agent` chuẩn của trình duyệt Windows, giúp request được máy chủ CoinGecko chấp nhận hợp lệ mà không bị đánh cờ spam.
 
 ### 1.2. Kiến trúc Chịu lỗi Đa tầng (Multi-Tier Resilient Provider Architecture)
 CoinGecko gói miễn phí (Free Tier) có hạn mức nghiêm ngặt (10–30 requests/phút). Để hệ thống hoạt động ổn định 100%, Thành viên 1 thiết kế kiến trúc 4 tầng bảo vệ:
