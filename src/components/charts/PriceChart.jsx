@@ -126,12 +126,19 @@ export const PriceChart = ({ onOpenDetail }) => {
     );
   }
 
-  // Xác định màu sắc biểu đồ theo xu hướng của khung thời gian đang xem (Gain: Xanh, Loss: Đỏ)
-  const isGain = chartData.length >= 2 
-    ? (chartData[chartData.length - 1][1] >= chartData[0][1])
-    : (selectedCoin.price_change_percentage_24h || 0) >= 0;
+  // Tính toán chuẩn xác tăng/giảm theo từng khung thời gian (Biến thông thường, không dùng Hook sau return)
+  const is24hGain = (selectedCoin.price_change_percentage_24h || 0) >= 0;
 
-  const strokeColor = isGain ? '#10b981' : '#f43f5e';
+  let isChartGain = is24hGain;
+  if (timeframe === 1) {
+    isChartGain = is24hGain;
+  } else if (timeframe === 7 && selectedCoin.price_change_percentage_7d_in_currency !== undefined) {
+    isChartGain = selectedCoin.price_change_percentage_7d_in_currency >= 0;
+  } else if (chartData.length >= 2) {
+    isChartGain = chartData[chartData.length - 1][1] >= chartData[0][1];
+  }
+
+  const strokeColor = isChartGain ? '#10b981' : '#f43f5e';
   const gradientId = `gradient-${selectedCoin.id}`;
 
   const currentDisplayPrice = hoverPoint ? hoverPoint.price : selectedCoin.current_price;
@@ -209,13 +216,13 @@ export const PriceChart = ({ onOpenDetail }) => {
         {/* Current Price and Timeframe Controls */}
         <div style={{ display: 'flex', alignItems: 'center', gap: '1.5rem', flexWrap: 'wrap' }}>
           <div className="chart-price-display">
-            <span className="chart-current-price font-mono" style={{ color: isGain ? 'var(--crypto-green)' : 'var(--crypto-red)' }}>
+            <span className="chart-current-price font-mono" style={{ color: isChartGain ? 'var(--crypto-green)' : 'var(--crypto-red)' }}>
               {formatPrice(currentDisplayPrice)}
             </span>
             <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', justifyContent: 'flex-end' }}>
-              <span className={isGain ? 'badge-gain' : 'badge-loss'}>
-                {isGain ? <TrendingUp size={12} /> : <TrendingDown size={12} />}
-                {selectedCoin.price_change_percentage_24h?.toFixed(2)}% (24h)
+              <span className={is24hGain ? 'badge-gain' : 'badge-loss'}>
+                {is24hGain ? <TrendingUp size={12} /> : <TrendingDown size={12} />}
+                {is24hGain ? '+' : ''}{selectedCoin.price_change_percentage_24h?.toFixed(2)}% (24h)
               </span>
             </div>
           </div>
