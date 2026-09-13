@@ -122,17 +122,18 @@ export const PriceChart = ({ onOpenDetail }) => {
     return ticks;
   }, [points, timeframe]);
 
-  if (!selectedCoin) return null;
+  if (!selectedCoin) {
+    return (
+      <div className="glass-card chart-container" style={{ minHeight: '340px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+        <div className="skeleton" style={{ width: '100%', height: '300px', borderRadius: 12 }} />
+      </div>
+    );
+  }
 
   // Xác định màu sắc biểu đồ theo xu hướng của khung thời gian đang xem (Gain: Xanh, Loss: Đỏ)
-  const isGain = useMemo(() => {
-    if (chartData.length >= 2) {
-      const firstPrice = chartData[0][1];
-      const lastPrice = chartData[chartData.length - 1][1];
-      return lastPrice >= firstPrice;
-    }
-    return (selectedCoin.price_change_percentage_24h || 0) >= 0;
-  }, [chartData, selectedCoin]);
+  const isGain = chartData.length >= 2 
+    ? (chartData[chartData.length - 1][1] >= chartData[0][1])
+    : (selectedCoin.price_change_percentage_24h || 0) >= 0;
 
   const strokeColor = isGain ? '#10b981' : '#f43f5e';
   const gradientId = `gradient-${selectedCoin.id}`;
